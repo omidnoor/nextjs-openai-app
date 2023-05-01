@@ -55,7 +55,7 @@ export default function AppLayout({ children }) {
           )}
         </div>
       </div>
-      <div className="pl-[300px]">{children}</div>
+      <div className="pl-[300px] overflow-auto ">{children}</div>
     </div>
   );
 }

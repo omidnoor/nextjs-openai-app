@@ -7,6 +7,8 @@ import { TextField, Button } from "@mui/material";
 
 export default function NewPost() {
   const [postContent, setPostContent] = useState("");
+  const [title, setTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
   const [render, setRender] = useState(true);
   const [values, setValues] = useState({});
 
@@ -22,7 +24,6 @@ export default function NewPost() {
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
-    console.log(values);
     const response = await fetch(`/api/generatePost`, {
       method: "POST",
       headers: {
@@ -31,13 +32,15 @@ export default function NewPost() {
       body: JSON.stringify(values),
     });
     const json = await response.json();
-    setPostContent(json?.postContent);
+    setPostContent(json?.post.postContent);
+    setTitle(json?.post.title);
+    setMetaDescription(json?.post.metaDescription);
     setRender(false);
     setSubmitting(false);
   };
 
   return (
-    <div className="h-full flex flex-col items-center justify-center ">
+    <div className="h-full flex flex-col items-center justify-center overflow-auto ">
       {render && (
         <Formik
           initialValues={{
@@ -50,13 +53,18 @@ export default function NewPost() {
           {({ handleSubmit, isSubmitting, errors, touched }) => (
             <Form className="">
               <div className="">
-                <div className="mb-4 ">
+                <div className="mb-14 ">
+                  <label htmlFor="topic">
+                    Generate a blog post on the topic of :
+                  </label>
                   <Field
                     as={TextField}
                     fullWidth
                     id="topic"
                     name="topic"
                     label="Topic"
+                    multiline
+                    rows={2}
                     error={touched.topic && Boolean(errors.topic)}
                     helperText={touched.topic && errors.topic}
                     sx={{
@@ -70,12 +78,17 @@ export default function NewPost() {
                   />
                 </div>
                 <div className="mb-4">
+                  <label htmlFor="keywords" className="mb-4">
+                    Targeting the following keywords :
+                  </label>
                   <Field
                     as={TextField}
                     fullWidth
                     id="keywords"
                     name="keywords"
                     label="Keywords"
+                    multiline
+                    rows={2}
                     error={touched.keywords && Boolean(errors.keywords)}
                     helperText={touched.keywords && errors.keywords}
                   />
@@ -102,8 +115,16 @@ export default function NewPost() {
       )}
 
       <div
+        dangerouslySetInnerHTML={{ __html: metaDescription }}
+        className={`max-w-screen   `}
+      />
+      <div
+        dangerouslySetInnerHTML={{ __html: title }}
+        className={`max-w-screen   `}
+      />
+      <div
         dangerouslySetInnerHTML={{ __html: postContent }}
-        className="max-w-screen-sm p-10"
+        className={`max-w-screen  p-5 ${!render ? "h-screen" : ""}`}
       />
     </div>
   );
