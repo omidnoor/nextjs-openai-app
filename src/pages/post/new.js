@@ -1,7 +1,10 @@
 import AppLayout from "@/components/AppLayout/AppLayout";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { useState } from "react";
 
 export default function NewPost() {
+  const [postContent, setPostContent] = useState("");
+
   const clickHandler = async () => {
     const response = await fetch(`/api/generatePost`, {
       method: "POST",
@@ -10,7 +13,8 @@ export default function NewPost() {
       },
     });
     const json = await response.json();
-    console.log("RESULT", json);
+    setPostContent(json.post.postContent);
+    console.log("RESULT", json.post.postContent);
   };
 
   return (
@@ -19,6 +23,10 @@ export default function NewPost() {
       <button className="btn" onClick={clickHandler}>
         Generate
       </button>
+      <div
+        dangerouslySetInnerHTML={{ __html: postContent }}
+        className="max-w-screen-sm p-10"
+      />
     </div>
   );
 }
