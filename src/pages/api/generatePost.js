@@ -1,15 +1,17 @@
 import { Configuration, OpenAIApi } from "openai";
 
 export default async function handler(req, res) {
+  const { topic, keywords } = req.body;
+  console.log(topic, keywords);
   const config = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
   });
 
   const openai = new OpenAIApi(config);
 
-  const topic = "Top 10 tips for cats owners";
-  const keywords =
-    "first-time cats owners, common cats health issues, best cats breeds, why cats are funny, common cats instics";
+  //   const topic = "Top 10 tips for cats owners";
+  //   const keywords =
+  //     "first-time cats owners, common cats health issues, best cats breeds, why cats are funny, common cats instics";
 
   const response = await openai.createCompletion({
     model: "text-davinci-003",

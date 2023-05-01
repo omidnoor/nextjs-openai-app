@@ -9,8 +9,8 @@ export default function AppLayout({ children }) {
   const { user } = useUser();
 
   return (
-    <div className="grid grid-cols-[300px_1fr] h-screen max-h-screen">
-      <div className="flex flex-col text-white overflow-hidden">
+    <div className="flex items-center justify-center h-screen max-h-screen relative">
+      <div className="fixed top-0 left-0 bottom-0 w-300px z-10 flex flex-col text-white overflow-hidden ">
         <div className="bg-slate-800 px-2 ">
           <Logo />
           <Link href="/post/new" className="btn">
@@ -55,7 +55,7 @@ export default function AppLayout({ children }) {
           )}
         </div>
       </div>
-      <div className="">{children}</div>
+      <div className="pl-[300px]">{children}</div>
     </div>
   );
 }
