@@ -13,8 +13,8 @@ export default function NewPost() {
       },
     });
     const json = await response.json();
-    setPostContent(json.post.postContent);
-    console.log("RESULT", json.post.postContent);
+    setPostContent(json?.postContent);
+    console.log("RESULT", json.post);
   };
 
   return (
