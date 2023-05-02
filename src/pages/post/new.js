@@ -4,11 +4,10 @@ import { useState } from "react";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 import { TextField, Button } from "@mui/material";
+import { useRouter } from "next/router";
 
 export default function NewPost() {
-  const [postContent, setPostContent] = useState("");
-  const [title, setTitle] = useState("");
-  const [metaDescription, setMetaDescription] = useState("");
+  const router = useRouter();
   const [render, setRender] = useState(true);
   const [values, setValues] = useState({});
 
@@ -32,15 +31,15 @@ export default function NewPost() {
       body: JSON.stringify(values),
     });
     const json = await response.json();
-    setPostContent(json?.post.postContent);
-    setTitle(json?.post.title);
-    setMetaDescription(json?.post.metaDescription);
+    if (json?.postId) {
+      router.push(`/post/${json.postId}`);
+    }
     setRender(false);
     setSubmitting(false);
   };
 
   return (
-    <div className="h-full flex flex-col items-center justify-center pt-20 ">
+    <div className="h-full flex flex-col items-center justify-center  bg-slate-100 p-10 rounded-md shadow-md ">
       {render && (
         <Formik
           initialValues={{
@@ -124,19 +123,6 @@ export default function NewPost() {
           )}
         </Formik>
       )}
-
-      <div
-        dangerouslySetInnerHTML={{ __html: metaDescription }}
-        className={`max-w-screen   `}
-      />
-      <div
-        dangerouslySetInnerHTML={{ __html: title }}
-        className={`max-w-screen   `}
-      />
-      {/* <div
-        dangerouslySetInnerHTML={{ __html: postContent }}
-        className={`max-w-screen  p-5 ${!render ? "h-screen" : ""}`}
-      /> */}
     </div>
   );
 }
