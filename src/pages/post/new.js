@@ -133,10 +133,10 @@ export default function NewPost() {
         dangerouslySetInnerHTML={{ __html: title }}
         className={`max-w-screen   `}
       />
-      <div
+      {/* <div
         dangerouslySetInnerHTML={{ __html: postContent }}
         className={`max-w-screen  p-5 ${!render ? "h-screen" : ""}`}
-      />
+      /> */}
     </div>
   );
 }
