@@ -48,7 +48,7 @@ export default withApiAuthRequired(async function handler(req, res) {
       messages: [
         {
           role: "system",
-          content: `You are a blog post generator`,
+          content: `You are a blog post generator. Your task is to create SEO-friendly blog posts with proper HTML formatting. Use heading tags like <h1>, <h2>, etc., for titles, and other HTML tags like <p>, <strong>, <ul>, <ol>, <li>, and <i> for formatting the content.`,
         },
         {
           role: "user",
@@ -56,7 +56,7 @@ export default withApiAuthRequired(async function handler(req, res) {
         },
         {
           role: "assistant",
-          content: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}. The content should be formatted in SEO-friendly HTML. limited to the following HTML tags: p, h1, h2, h3, h4, h5, h6, strong, ul, ol, li, i.`,
+          content: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}. The content should be formatted in SEO-friendly HTML. limited to the following HTML tags: p, h1, h2, h3, h4, h5, h6, strong, ul, ol, li, i. use heading tags for titles.`,
         },
       ],
     });
@@ -115,9 +115,9 @@ export default withApiAuthRequired(async function handler(req, res) {
     const metaDescription =
       metaDescriptionResponse.data.choices[0]?.message.content || "";
 
-    console.log("response: ", postContent);
-    console.log("response: ", title);
-    console.log("response: ", metaDescription);
+    // console.log("response: ", postContent);
+    // console.log("response: ", title);
+    // console.log("response: ", metaDescription);
 
     await db.collection("users").updateOne(
       {
