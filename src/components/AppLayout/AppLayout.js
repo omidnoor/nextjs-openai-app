@@ -9,7 +9,7 @@ export default function AppLayout({ children }) {
   const { user } = useUser();
 
   return (
-    <div className="flex items-center justify-center h-screen max-h-screen relative">
+    <div className="flex items-center justify-center mt-10 relative">
       <div className="fixed top-0 left-0 bottom-0 w-300px z-10 flex flex-col text-white overflow-hidden ">
         <div className="bg-slate-800 px-2 ">
           <Logo />
@@ -55,7 +55,7 @@ export default function AppLayout({ children }) {
           )}
         </div>
       </div>
-      <div className="pl-[300px] overflow-auto ">{children}</div>
+      <div className="pl-[300px]">{children}</div>
     </div>
   );
 }

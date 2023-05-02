@@ -40,7 +40,7 @@ export default function NewPost() {
   };
 
   return (
-    <div className="h-full flex flex-col items-center justify-center overflow-auto ">
+    <div className="h-full flex flex-col items-center justify-center pt-20 ">
       {render && (
         <Formik
           initialValues={{
@@ -68,6 +68,7 @@ export default function NewPost() {
                     error={touched.topic && Boolean(errors.topic)}
                     helperText={touched.topic && errors.topic}
                     sx={{
+                      marginTop: "10px",
                       width: "100%",
                       maxWidth: "800px",
                       height: "56px",
@@ -91,6 +92,15 @@ export default function NewPost() {
                     rows={2}
                     error={touched.keywords && Boolean(errors.keywords)}
                     helperText={touched.keywords && errors.keywords}
+                    sx={{
+                      marginTop: "10px",
+                      width: "100%",
+                      maxWidth: "800px",
+                      height: "56px",
+                      ".MuiInputBase-input": {
+                        height: "100%",
+                      },
+                    }}
                   />
                 </div>
                 <Button
@@ -100,6 +110,7 @@ export default function NewPost() {
                   disabled={isSubmitting}
                   fullWidth
                   sx={{
+                    marginTop: "30px",
                     backgroundColor: "green !important",
                     "&:hover": {
                       backgroundColor: "darkgreen !important",
