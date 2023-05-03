@@ -17,6 +17,16 @@ export default withApiAuthRequired(async function handler(req, res) {
     }
 
     const { topic, keywords } = req.body;
+    if (!topic || !keywords) {
+      res.status(422).json({ message: "Please provide topic and keywords" });
+    }
+    if (topic.length > 300 || keywords.length > 300) {
+      res
+        .status(422)
+        .json({
+          message: "Topic and keywords must be less than 300 characters",
+        });
+    }
     const config = new Configuration({
       apiKey: process.env.OPENAI_API_KEY,
     });

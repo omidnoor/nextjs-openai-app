@@ -10,7 +10,6 @@ export default async function handler(req, res) {
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
     const lineItems = [
       {
         price: process.env.STRIPE_PRODUCT_PRICE_ID,

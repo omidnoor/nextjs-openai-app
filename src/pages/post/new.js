@@ -17,11 +17,11 @@ export default function NewPost() {
   const validate = Yup.object({
     topic: Yup.string()
       .required("Topic is required")
-      .min(5, "Topic must be at least 50 characters")
+      .min(3, "Topic must be at least 50 characters")
       .max(300, "Topic must be less than 300 characters"),
     keywords: Yup.string()
       .required("Keywords is required")
-      .min(5, "Topic must be at least 50 characters")
+      .min(3, "Topic must be at least 50 characters")
       .max(100, "Topic must be less than 300 characters"),
   });
 
@@ -121,7 +121,10 @@ export default function NewPost() {
                     type="submit"
                     variant="contained"
                     // color="primary"
-                    disabled={isSubmitting}
+                    disabled={
+                      isSubmitting ||
+                      (touched.keywords && Boolean(errors.keywords))
+                    }
                     fullWidth
                     sx={{
                       marginTop: "30px",
@@ -156,6 +159,14 @@ NewPost.getLayout = function getLayout(page, pageProps) {
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
     const { postId, posts, availableTokens } = await getAppProps(context);
+    if (!availableTokens) {
+      return {
+        redirect: {
+          destination: "/token-topup",
+          permanent: false,
+        },
+      };
+    }
     return {
       props: {
         availableTokens,
