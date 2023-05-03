@@ -1,6 +1,7 @@
 import AppLayout from "@/components/AppLayout/AppLayout";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { Button } from "@mui/material";
+import { getAppProps } from "../../utils/getAppProps";
 
 export default function TokenTopup() {
   const handleClick = async () => {
@@ -37,8 +38,11 @@ TokenTopup.getLayout = function getLayout(page, pageProps) {
   return <AppLayout {...pageProps}>{page}</AppLayout>;
 };
 
-export const getServerSideProps = withPageAuthRequired(async (context) => {
-  return {
-    props: {},
-  };
+export const getServerSideProps = withPageAuthRequired({
+  async getServerSideProps(context) {
+    const props = await getAppProps(context);
+    return {
+      props,
+    };
+  },
 });

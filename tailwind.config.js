@@ -13,6 +13,7 @@ module.exports = {
         body: "var(--font-dm-sans)",
         heading: "var(--font-dm-serif)",
       },
+      plugins: [require("tailwind-scrollbar-hide")],
     },
   },
   plugins: [],

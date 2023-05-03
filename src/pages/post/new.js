@@ -5,6 +5,7 @@ import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 import { TextField, Button } from "@mui/material";
 import { useRouter } from "next/router";
+import { getAppProps } from "../../../utils/getAppProps";
 
 export default function NewPost() {
   const router = useRouter();
@@ -131,8 +132,15 @@ NewPost.getLayout = function getLayout(page, pageProps) {
   return <AppLayout {...pageProps}>{page}</AppLayout>;
 };
 
-export const getServerSideProps = withPageAuthRequired(async (context) => {
-  return {
-    props: {},
-  };
+export const getServerSideProps = withPageAuthRequired({
+  async getServerSideProps(context) {
+    const { posts, availableTokens } = await getAppProps(context);
+    return {
+      props: {
+        availableTokens,
+        posts,
+        postId,
+      },
+    };
+  },
 });

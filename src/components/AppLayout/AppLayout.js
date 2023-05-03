@@ -5,9 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import Logo from "../Logo/Logo";
 
-export default function AppLayout({ children }) {
+export default function AppLayout({
+  children,
+  availableTokens,
+  posts,
+  postId,
+}) {
   const { user } = useUser();
-
   return (
     <div className="grid grid-cols-[300px_1fr] h-screen max-h-sceen">
       <div className="flex flex-col text-white overflow-hidden">
@@ -24,11 +28,25 @@ export default function AppLayout({ children }) {
               icon={faCoins}
               className="text-yellow-500 w-[15px]"
             />
-            <span className="pl-1">0 token available</span>
+            <span className="pl-1">{availableTokens} token available</span>
           </Link>
         </div>
-        <div className="flex-1 overflow-auto bg-gradient-to-b from-slate-800 to-cyan-800">
-          list of posts
+        <div className="px-4 flex-1 overflow-auto scrollbar-hide bg-gradient-to-b from-slate-800 to-cyan-800">
+          {posts?.map((post, index) => {
+            const truncatedTitle = post.title.slice(0, 50);
+
+            return (
+              <Link
+                href={`/post/${post._id}`}
+                key={index}
+                className={`py-1  block text-ellipsis overflow-hidden whitespace-nowrap my-1 px-2 bg-white/10 cursor-pointer border border-white/0 rounded-sm ${
+                  postId === post._id ? "bg-white/30 border-white" : ""
+                }`}
+              >
+                {truncatedTitle}
+              </Link>
+            );
+          })}
         </div>
         <div className="bg-cyan-800 flex items-center gap-2 border-t border-t-black/50 h-20 px-2">
           {!!user ? (
