@@ -11,11 +11,12 @@ export default function TokenTopup() {
         "Content-Type": "application/json",
       },
     });
+    const json = await response.json();
+    window.location.href = json.session.url;
   };
 
   return (
     <div className="">
-      <h1>tokentopup page</h1>
       <Button
         onClick={handleClick}
         variant="contained"
