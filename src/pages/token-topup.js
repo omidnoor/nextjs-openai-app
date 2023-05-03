@@ -2,6 +2,8 @@ import AppLayout from "@/components/AppLayout/AppLayout";
 import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { Button } from "@mui/material";
 import { getAppProps } from "../../utils/getAppProps";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCoins } from "@fortawesome/free-solid-svg-icons";
 
 export default function TokenTopup() {
   const handleClick = async () => {
@@ -16,7 +18,12 @@ export default function TokenTopup() {
   };
 
   return (
-    <div className="">
+    <div className="flex flex-col justify-center items-center gap-2">
+      <FontAwesomeIcon
+        icon={faCoins}
+        className="text-yellow-500 "
+        style={{ fontSize: "50px" }}
+      />
       <Button
         onClick={handleClick}
         variant="contained"

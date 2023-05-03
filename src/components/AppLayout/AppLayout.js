@@ -87,7 +87,7 @@ export default function AppLayout({
           )}
         </div>
       </div>
-      {children}
+      <div className="m-auto">{children}</div>
     </div>
   );
 }

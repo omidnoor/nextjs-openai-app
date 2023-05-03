@@ -5,7 +5,7 @@ import { getAppProps } from "../../utils/getAppProps";
 
 export default function Success() {
   return (
-    <div className="">
+    <div className="flex items-center justify-center text-blue-800 ">
       <h1>Thank you for your purchase!</h1>
     </div>
   );
