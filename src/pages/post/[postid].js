@@ -14,7 +14,7 @@ export default function Post({
 }) {
   return (
     <div className="overflow-auto h-full ">
-      <div className="max-w-screen-sm mx-auto ">
+      <div className="max-w-screen-sm mx-auto px-4">
         <div className="text-sm font-bold mt-6 p-2 bg-stone-200 rounded-sm">
           SEO title and meta description
         </div>
