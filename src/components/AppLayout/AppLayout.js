@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "../Logo/Logo";
+import { Button } from "@mui/material";
 
 export default function AppLayout({
   children,
@@ -17,9 +18,22 @@ export default function AppLayout({
       <div className="flex flex-col text-white overflow-hidden">
         <div className="bg-slate-800 px-2 ">
           <Logo />
-          <Link href="/post/new" className="btn">
-            New Post
-          </Link>
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{
+              marginTop: "30px",
+              backgroundColor: "green !important",
+              "&:hover": {
+                backgroundColor: "darkgreen !important",
+                textDecoration: "none",
+              },
+            }}
+          >
+            <Link style={{ textDecoration: "none" }} href="/post/new">
+              New Post
+            </Link>
+          </Button>
           <Link
             href="/token-topup"
             className="flex justify-center mt-2 text-center "

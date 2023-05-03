@@ -1,7 +1,7 @@
 import Cors from "micro-cors";
 import stripeInit from "stripe";
 import verifyStripe from "@webdeveducation/next-verify-stripe";
-import { connectDb } from "../../../../utils/db";
+import { connectDb, disconnectDb } from "../../../../utils/db";
 
 const cors = Cors({
   methods: ["POST", "HEAD"],
@@ -65,6 +65,7 @@ const handler = async (req, res) => {
       default:
         console.log("Unhandled event: ", event.type);
     }
+    disconnectDb();
     res.status(200).json({ received: true });
   }
 };
