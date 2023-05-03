@@ -29,27 +29,15 @@ export default async function handler(req, res) {
       mode: "payment",
       success_url: `${protocol}${host}/success`,
       cancel_url: `${protocol}${host}/success`,
+      payment_intent_data: {
+        metadata: {
+          sub: user.sub,
+        },
+      },
+      metadata: {
+        sub: user.sub,
+      },
     });
-
-    const client = await connectDb();
-    const db = client.db(process.env.MONGODB_NAME);
-    const users = await db.collection("users").updateOne(
-      {
-        auth0Id: user.sub,
-      },
-      {
-        $inc: {
-          availableTokens: 10,
-        },
-
-        $setOnInsert: {
-          auth0Id: user.sub,
-        },
-      },
-      {
-        upsert: true,
-      },
-    );
 
     res.status(200).json({ session: checkoutSession });
   } catch (error) {
