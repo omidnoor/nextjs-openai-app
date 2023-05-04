@@ -16,8 +16,8 @@ export default function AppLayout({
 }) {
   const { user } = useUser();
 
-  const { setPostsFromSSR, posts } = useContext(PostsContext);
-
+  const { setPostsFromSSR, posts, getPosts } = useContext(PostsContext);
+  // console.log(posts[posts.length - 1].created);
   useEffect(() => {
     setPostsFromSSR(postsFromSSR);
   }, [postsFromSSR, setPostsFromSSR]);
@@ -70,7 +70,12 @@ export default function AppLayout({
               </Link>
             );
           })}
-          <div className="hover:underline text-sm text-slate-400 text-center cursor-pointer mt-4">
+          <div
+            onClick={() => {
+              getPosts({ lastPostDate: posts[posts.length - 1].created });
+            }}
+            className="hover:underline text-sm text-slate-400 text-center cursor-pointer mt-4"
+          >
             Load more posts
           </div>
         </div>
