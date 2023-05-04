@@ -20,7 +20,7 @@ export default withApiAuthRequired(async function handler(req, res) {
           $lt: new Date(lastPostDate),
         },
       })
-      .limit(3)
+      .limit(5)
       .sort({ created: -1 })
       .toArray();
 
