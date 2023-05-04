@@ -1,5 +1,5 @@
 import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
-import { connectDb } from "../../../utils/db";
+import { connectDb, disconnectDb } from "../../../utils/db";
 
 export default withApiAuthRequired(async function handler(req, res) {
   try {
@@ -30,5 +30,7 @@ export default withApiAuthRequired(async function handler(req, res) {
     return;
   } catch (error) {
     res.status(500).json({ message: error.message });
+  } finally {
+    disconnectDb();
   }
 });
