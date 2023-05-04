@@ -5,13 +5,51 @@ import { ObjectId } from "mongodb";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHashtag } from "@fortawesome/free-solid-svg-icons";
 import { getAppProps } from "../../../utils/getAppProps";
+import { Button } from "@mui/material";
+import { useContext, useState } from "react";
+import { useRouter } from "next/router";
+import PostsContext from "@/context/postsContext";
 
 export default function Post({
   postContent,
   title,
   metaDescription,
   keywords,
+  postId,
 }) {
+  const [confirmation, setConfirmation] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const router = useRouter();
+  const { removePost } = useContext(PostsContext);
+  console.log(postId);
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/deletePost/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId,
+        }),
+      });
+      const json = await response.json();
+      if (json.success) {
+        setMessage("Post deleted successfully!");
+        removePost(postId);
+        router.replace(`/post/new`);
+      }
+      setError("");
+    } catch (error) {
+      setError("Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="overflow-auto h-full ">
       <div className="max-w-screen-sm mx-auto px-4">
@@ -41,6 +79,67 @@ export default function Post({
           Blog Post
         </div>
         <div dangerouslySetInnerHTML={{ __html: postContent || "" }} />
+        <div className="my-4">
+          {!confirmation && (
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{
+                marginTop: "30px",
+                backgroundColor: "#bf404e !important",
+                "&:hover": {
+                  backgroundColor: "#a65966 !important",
+                  textDecoration: "none",
+                },
+                font: "inherit",
+              }}
+              onClick={() => setConfirmation(true)}
+            >
+              Delete Post
+            </Button>
+          )}
+          {!!confirmation && (
+            <div className="flex flex-col justify-center items-center ">
+              <p className="p-2 bg-red-300 text-center">
+                Are you sure you want to delete this post? This action is
+                irreversible
+              </p>
+              <div className="flex items-center h-full w-full gap-4">
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  sx={{
+                    // backgroundColor: "#bf404e !important",
+                    "&:hover": {
+                      backgroundColor: "#2d2dd2 !important",
+                      color: "white",
+                      textDecoration: "none",
+                    },
+                    font: "inherit",
+                  }}
+                  onClick={() => setConfirmation(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    backgroundColor: "#bf404e !important",
+                    "&:hover": {
+                      backgroundColor: "#a65966 !important",
+                      textDecoration: "none",
+                    },
+                    font: "inherit",
+                  }}
+                  onClick={() => handleDelete()}
+                >
+                  Confirm
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -81,6 +180,7 @@ export const getServerSideProps = withPageAuthRequired({
         keywords: post.keywords,
         availableTokens,
         posts,
+        postCreated: post.created.toString(),
         postId,
       },
     };
