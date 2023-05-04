@@ -13,7 +13,7 @@ export default function NewPost() {
   const router = useRouter();
   const [render, setRender] = useState(false);
   const [values, setValues] = useState({});
-
+  console.log();
   const validate = Yup.object({
     topic: Yup.string()
       .required("Topic is required")

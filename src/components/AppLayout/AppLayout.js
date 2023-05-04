@@ -66,7 +66,6 @@ export default function AppLayout({
         <div className="px-4 flex-1 overflow-auto scrollbar-hide bg-gradient-to-b from-slate-800 to-cyan-800">
           {posts?.map((post, index) => {
             const truncatedTitle = post.title.slice(0, 50);
-
             return (
               <Link
                 href={`/post/${post._id}`}
