@@ -49,7 +49,7 @@ export default withApiAuthRequired(async function handler(req, res) {
     //         "metaDescription": meta description goes here
     //       }`,
     // });
-
+    console.log("Before calling OpenAI API");
     const postContentResponse = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       temperature: 0.5,
@@ -68,7 +68,7 @@ export default withApiAuthRequired(async function handler(req, res) {
         },
       ],
     });
-
+    console.log("After calling OpenAI API");
     const postContent =
       postContentResponse.data.choices[0]?.message.content || "";
 
