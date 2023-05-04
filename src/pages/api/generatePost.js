@@ -21,11 +21,9 @@ export default withApiAuthRequired(async function handler(req, res) {
       res.status(422).json({ message: "Please provide topic and keywords" });
     }
     if (topic.length > 300 || keywords.length > 300) {
-      res
-        .status(422)
-        .json({
-          message: "Topic and keywords must be less than 300 characters",
-        });
+      res.status(422).json({
+        message: "Topic and keywords must be less than 300 characters",
+      });
     }
     const config = new Configuration({
       apiKey: process.env.OPENAI_API_KEY,
@@ -54,7 +52,7 @@ export default withApiAuthRequired(async function handler(req, res) {
 
     const postContentResponse = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
-      temperature: 1,
+      temperature: 0.5,
       messages: [
         {
           role: "system",

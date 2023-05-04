@@ -45,6 +45,7 @@ export default function AppLayout({
                 backgroundColor: "darkgreen !important",
                 textDecoration: "none",
               },
+              font: "inherit",
             }}
           >
             <Link style={{ textDecoration: "none" }} href="/post/new">
@@ -78,7 +79,7 @@ export default function AppLayout({
               </Link>
             );
           })}
-          {!noMorePosts && (
+          {!noMorePosts && posts.length > 5 && (
             <div
               onClick={() => {
                 getPosts({ lastPostDate: posts[posts.length - 1].created });

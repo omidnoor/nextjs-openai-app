@@ -87,6 +87,7 @@ export default function NewPost() {
                         ".MuiInputBase-input": {
                           height: "100%",
                         },
+                        font: "inherit",
                       }}
                     />
                   </div>
@@ -113,6 +114,7 @@ export default function NewPost() {
                         ".MuiInputBase-input": {
                           height: "100%",
                         },
+                        font: "inherit",
                       }}
                     />
                   </div>
@@ -132,6 +134,7 @@ export default function NewPost() {
                       "&:hover": {
                         backgroundColor: "darkgreen !important",
                       },
+                      font: "inherit",
                     }}
                   >
                     Generate
