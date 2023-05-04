@@ -1,19 +1,17 @@
 import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
 import { ObjectId } from "mongodb";
-import { disconnectDb } from "../../../utils/db";
+import { connectDb, disconnectDb } from "../../../utils/db";
+import { useContext } from "react";
 
 export default withApiAuthRequired(async function handler(req, res) {
   try {
-    const {
-      user: { sub },
-    } = await getSession();
+    const { user } = await getSession(req, res);
     const client = await connectDb();
     const db = client.db(process.env.MONGODB_NAME);
 
     const userProfile = await db.collection("users").findOne({
-      auth0Id: sub,
+      auth0Id: user.sub,
     });
-
     const { postId } = req.body;
 
     await db.collection("posts").deleteOne({

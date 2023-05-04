@@ -52,9 +52,13 @@ export const PostsProvider = ({ children }) => {
     [],
   );
 
+  const removePost = useCallback((postId) => {
+    setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
+  }, []);
+
   return (
     <PostsContext.Provider
-      value={{ posts, setPostsFromSSR, getPosts, noMorePosts }}
+      value={{ posts, setPostsFromSSR, getPosts, noMorePosts, removePost }}
     >
       {children}
     </PostsContext.Provider>

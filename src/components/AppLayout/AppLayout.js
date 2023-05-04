@@ -31,7 +31,7 @@ export default function AppLayout({
   }, [postsFromSSR, setPostsFromSSR, postId, postCreated, getPosts]);
 
   return (
-    <div className="grid grid-cols-[300px_1fr] h-screen max-h-sceen">
+    <div className="grid grid-cols-[300px_1fr] h-screen max-h-screen">
       <div className="flex flex-col text-white overflow-hidden">
         <div className="bg-slate-800 px-2 ">
           <Logo />
@@ -114,7 +114,7 @@ export default function AppLayout({
           )}
         </div>
       </div>
-      <div className="m-auto">{children}</div>
+      {children}
     </div>
   );
 }
