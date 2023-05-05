@@ -12,23 +12,23 @@ export default function AppLayout({
   children,
   availableTokens,
   posts: postsFromSSR,
-  postId,
+  postid,
   postCreated,
 }) {
   const { user } = useUser();
 
   const { setPostsFromSSR, posts, getPosts, noMorePosts } =
     useContext(PostsContext);
-  // console.log(posts[posts.length - 1].created);
+  // console.log(posts);
   useEffect(() => {
     setPostsFromSSR(postsFromSSR);
-    if (postId) {
-      const exists = postsFromSSR.find((post) => post._id === postId);
+    if (postid) {
+      const exists = postsFromSSR.find((post) => post._id === postid);
       if (!exists) {
         getPosts({ getNewerPosts: true, lastPostDate: postCreated });
       }
     }
-  }, [postsFromSSR, setPostsFromSSR, postId, postCreated, getPosts]);
+  }, [postsFromSSR, setPostsFromSSR, postid, postCreated, getPosts]);
 
   return (
     <div className="grid grid-cols-[300px_1fr] h-screen max-h-screen">
@@ -71,7 +71,7 @@ export default function AppLayout({
                 href={`/post/${post._id}`}
                 key={index}
                 className={`py-1  block text-ellipsis overflow-hidden whitespace-nowrap my-1 px-2 bg-white/10 cursor-pointer border border-white/0 rounded-sm ${
-                  postId === post._id ? "bg-white/30 border-white" : ""
+                  postid === post._id ? "bg-white/30 border-white" : ""
                 }`}
               >
                 {truncatedTitle}

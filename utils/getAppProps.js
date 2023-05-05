@@ -34,6 +34,6 @@ export const getAppProps = async (context) => {
       metaDescription: post.metaDescription,
       topic: post.topic,
     })),
-    postId: context.params?.postId || null,
+    postid: context.params?.postid || null,
   };
 };

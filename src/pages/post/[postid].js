@@ -15,7 +15,7 @@ export default function Post({
   title,
   metaDescription,
   keywords,
-  postId,
+  postid,
 }) {
   const [confirmation, setConfirmation] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ export default function Post({
   const [message, setMessage] = useState("");
   const router = useRouter();
   const { removePost } = useContext(PostsContext);
-  console.log(postId);
+  // console.log(postid);
   const handleDelete = async () => {
     setLoading(true);
     try {
@@ -33,13 +33,13 @@ export default function Post({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          postId,
+          postid,
         }),
       });
       const json = await response.json();
       if (json.success) {
         setMessage("Post deleted successfully!");
-        removePost(postId);
+        removePost(postid);
         router.replace(`/post/new`);
       }
       setError("");
@@ -151,7 +151,7 @@ Post.getLayout = function getLayout(page, pageProps) {
 
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
-    const { posts, availableTokens, postId } = await getAppProps(context);
+    const { posts, availableTokens, postid } = await getAppProps(context);
     // console.log(posts);
     const userSession = await getSession(context.req, context.res);
     const client = await connectDb();
@@ -160,7 +160,7 @@ export const getServerSideProps = withPageAuthRequired({
       auth0Id: userSession.user.sub,
     });
     const post = await db.collection("posts").findOne({
-      _id: new ObjectId(context.params.postId),
+      _id: new ObjectId(context.params.postid),
       userId: user._id,
     });
     if (!post) {
@@ -181,7 +181,7 @@ export const getServerSideProps = withPageAuthRequired({
         availableTokens,
         posts,
         postCreated: post.created.toString(),
-        postId,
+        postid,
       },
     };
   },

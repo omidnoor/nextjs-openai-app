@@ -28,7 +28,7 @@ export default function TokenTopup() {
         onClick={handleClick}
         variant="contained"
         // color="primary"
-        fullWidth
+        // fullWidth
         sx={{
           backgroundColor: "green !important",
           "&:hover": {

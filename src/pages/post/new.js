@@ -13,7 +13,7 @@ export default function NewPost() {
   const router = useRouter();
   const [render, setRender] = useState(false);
   const [values, setValues] = useState({});
-  console.log();
+  // console.log("this is new post page");
   const validate = Yup.object({
     topic: Yup.string()
       .required("Topic is required")
@@ -36,8 +36,8 @@ export default function NewPost() {
         body: JSON.stringify(values),
       });
       const json = await response.json();
-      if (json?.postId) {
-        router.push(`/post/${json.postId}`);
+      if (json?.postid) {
+        router.push(`/post/${json.postid}`);
       }
       setRender(false);
       setSubmitting(false);
@@ -161,7 +161,7 @@ NewPost.getLayout = function getLayout(page, pageProps) {
 
 export const getServerSideProps = withPageAuthRequired({
   async getServerSideProps(context) {
-    const { postId, posts, availableTokens } = await getAppProps(context);
+    const { postid, posts, availableTokens } = await getAppProps(context);
     if (!availableTokens) {
       return {
         redirect: {
@@ -174,7 +174,7 @@ export const getServerSideProps = withPageAuthRequired({
       props: {
         availableTokens,
         posts,
-        postId,
+        postid,
       },
     };
   },

@@ -4,3 +4,5 @@ instance_class: F2
 
 env_variables:
   NEXT_PUBLIC_GOOGLE_CLOUD_PROJECT: nextjs-openai-app
+# https://nextjs-openai-app.uw.r.appspot.com
+# nextjs-openai-app@appspot.gserviceaccount.com]

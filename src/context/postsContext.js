@@ -20,7 +20,7 @@ function postReducer(state, action) {
     case "DELETE_POST": {
       const newPosts = [];
       state.forEach((post) => {
-        if (post._id !== action.postId) {
+        if (post._id !== action.postid) {
           newPosts.push(post);
         }
       });
@@ -66,10 +66,10 @@ export const PostsProvider = ({ children }) => {
     [],
   );
 
-  const removePost = useCallback((postId) => {
+  const removePost = useCallback((postid) => {
     dispatch({
       type: "DELETE_POST",
-      postId,
+      postid,
     });
   }, []);
 
