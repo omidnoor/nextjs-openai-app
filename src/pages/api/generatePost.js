@@ -3,6 +3,7 @@ import { Configuration, OpenAIApi } from "openai";
 import { connectDb, disconnectDb } from "../../../utils/db";
 
 export default withApiAuthRequired(async function handler(req, res) {
+  console.log("dsfsdf");
   try {
     const { user } = await getSession(req, res);
     const client = await connectDb();
@@ -163,6 +164,6 @@ export default withApiAuthRequired(async function handler(req, res) {
   } catch (error) {
     res.status(500).json({ message: error.message });
   } finally {
-    await disconnectDb();
+    disconnectDb();
   }
 });

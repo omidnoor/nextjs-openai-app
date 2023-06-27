@@ -39,6 +39,7 @@ export default function NewPost() {
       if (json?.postid) {
         router.push(`/post/${json.postid}`);
       }
+      console.log(json);
       setRender(false);
       setSubmitting(false);
     } catch (error) {
