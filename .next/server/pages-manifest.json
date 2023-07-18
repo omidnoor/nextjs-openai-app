@@ -1,8 +1,17 @@
 {
   "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/api/addToken": "pages/api/addToken.js",
+  "/api/auth/[...auth0]": "pages/api/auth/[...auth0].js",
+  "/api/deletePost": "pages/api/deletePost.js",
+  "/api/generatePost": "pages/api/generatePost.js",
+  "/api/getPosts": "pages/api/getPosts.js",
+  "/": "pages/index.html",
+  "/success": "pages/success.js",
   "/post/[postid]": "pages/post/[postid].js",
-  "/": "pages/index.js",
-  "/post/new": "pages/post/new.js"
+  "/token-topup": "pages/token-topup.js",
+  "/post/new": "pages/post/new.js",
+  "/_error": "pages/_error.js",
+  "/api/webhooks/stripe": "pages/api/webhooks/stripe.js",
+  "/404": "pages/404.html"
 }

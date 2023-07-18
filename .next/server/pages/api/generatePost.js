@@ -1,65 +1,230 @@
 "use strict";
-/*
- * ATTENTION: An "eval-source-map" devtool has been used.
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file with attached SourceMaps in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (() => {
 var exports = {};
-exports.id = "pages/api/generatePost";
-exports.ids = ["pages/api/generatePost"];
+exports.id = 230;
+exports.ids = [230];
 exports.modules = {
 
-/***/ "@auth0/nextjs-auth0":
-/*!**************************************!*\
-  !*** external "@auth0/nextjs-auth0" ***!
-  \**************************************/
+/***/ 93:
 /***/ ((module) => {
 
 module.exports = require("@auth0/nextjs-auth0");
 
 /***/ }),
 
-/***/ "mongodb":
-/*!**************************!*\
-  !*** external "mongodb" ***!
-  \**************************/
+/***/ 8013:
 /***/ ((module) => {
 
 module.exports = require("mongodb");
 
 /***/ }),
 
-/***/ "openai":
-/*!*************************!*\
-  !*** external "openai" ***!
-  \*************************/
-/***/ ((module) => {
+/***/ 3362:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-module.exports = require("openai");
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "default": () => (/* binding */ generatePost)
+});
+
+// EXTERNAL MODULE: external "@auth0/nextjs-auth0"
+var nextjs_auth0_ = __webpack_require__(93);
+;// CONCATENATED MODULE: external "openai"
+const external_openai_namespaceObject = require("openai");
+// EXTERNAL MODULE: ./utils/db.js
+var utils_db = __webpack_require__(5690);
+;// CONCATENATED MODULE: ./src/pages/api/generatePost.js
+
+
+
+/* harmony default export */ const generatePost = ((0,nextjs_auth0_.withApiAuthRequired)(async function handler(req, res) {
+    console.log("dsfsdf");
+    try {
+        const { user } = await (0,nextjs_auth0_.getSession)(req, res);
+        const client = await (0,utils_db/* connectDb */.Q)();
+        const db = client.db(process.env.MONGODB_NAME);
+        const userDb = await db.collection("users").findOne({
+            auth0Id: user.sub
+        });
+        if (!userDb?.availableTokens) {
+            return res.status(403).json({
+                error: "Unauthorized"
+            });
+        }
+        const { topic, keywords } = req.body;
+        if (!topic || !keywords) {
+            res.status(422).json({
+                message: "Please provide topic and keywords"
+            });
+        }
+        if (topic.length > 300 || keywords.length > 300) {
+            res.status(422).json({
+                message: "Topic and keywords must be less than 300 characters"
+            });
+        }
+        const config = new external_openai_namespaceObject.Configuration({
+            apiKey: process.env.OPENAI_API_KEY
+        });
+        const openai = new external_openai_namespaceObject.OpenAIApi(config);
+        //   const topic = "Top 10 tips for cats owners";
+        //   const keywords =
+        //     "first-time cats owners, common cats health issues, best cats breeds, why cats are funny, common cats instics";
+        // const response = await openai.createCompletion({
+        //   model: "text-davinci-003",
+        //   temperature: 1,
+        //   max_tokens: 3600,
+        //   prompt: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}.
+        //       The content should be formatted in SEO-friendly HTML.
+        //       The response must also include appropriate HTML title and meta description content.
+        //       The return format must be stringified JSON in the following format:
+        //       {
+        //         "postContent": post content here
+        //         "title": title goes here
+        //         "metaDescription": meta description goes here
+        //       }`,
+        // });
+        // console.log("Before calling OpenAI API");
+        const postContentResponse = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            temperature: 0.5,
+            messages: [
+                {
+                    role: "system",
+                    content: `You are a blog post generator. Your task is to create SEO-friendly blog posts with proper HTML formatting. Use heading tags like <h1>, <h2>, etc., for titles, and other HTML tags like <p>, <strong>, <ul>, <ol>, <li>, and <i> for formatting the content.`
+                },
+                {
+                    role: "user",
+                    content: `generate me a blog post`
+                },
+                {
+                    role: "assistant",
+                    content: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}. The content should be formatted in SEO-friendly HTML. limited to the following HTML tags: p, h1, h2, h3, h4, h5, h6, strong, ul, ol, li, i. use heading tags for titles.`
+                }
+            ]
+        });
+        // console.log("After calling OpenAI API");
+        const postContent = postContentResponse.data.choices[0]?.message.content || "";
+        const titleResponse = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            temperature: 1,
+            messages: [
+                {
+                    role: "system",
+                    content: `You are a blog post generator`
+                },
+                {
+                    role: "user",
+                    content: `generate me a blog post`
+                },
+                {
+                    role: "assistant",
+                    content: postContent
+                },
+                {
+                    role: "user",
+                    content: `generate an appropriate title tag text for the above blog post`
+                }
+            ]
+        });
+        const title = titleResponse.data.choices[0]?.message.content || "";
+        const metaDescriptionResponse = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            temperature: 1,
+            messages: [
+                {
+                    role: "system",
+                    content: `You are a blog post generator`
+                },
+                {
+                    role: "user",
+                    content: `generate me a blog post`
+                },
+                {
+                    role: "assistant",
+                    content: postContent
+                },
+                {
+                    role: "user",
+                    content: `generate SEO-fiendly meta description content for the aboveblog post`
+                }
+            ]
+        });
+        const metaDescription = metaDescriptionResponse.data.choices[0]?.message.content || "";
+        // console.log("response: ", postContent);
+        // console.log("response: ", title);
+        // console.log("response: ", metaDescription);
+        await db.collection("users").updateOne({
+            auth0: user.sub
+        }, {
+            $inc: {
+                availableToken: -1
+            }
+        });
+        const post = await db.collection("posts").insertOne({
+            postContent: postContent || "",
+            title: title || "",
+            metaDescription: metaDescription || "",
+            topic,
+            keywords,
+            userId: userDb._id,
+            created: new Date()
+        });
+        res.status(200).json({
+            postid: post.insertedId
+        });
+    // const postText = response.data.choices[0]?.text.split("\n").join("");
+    // console.log(postText);
+    // console.log(JSON.parse(postText).postContent);
+    // const postContent = JSON.parse(postText).postContent;
+    // const title = JSON.parse(postText).title;
+    // const metaDescription = JSON.parse(postText).metaDescription;
+    // res.status(200).json({ postContent });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    } finally{
+        (0,utils_db/* disconnectDb */.s)();
+    }
+}));
+
 
 /***/ }),
 
-/***/ "(api)/./src/pages/api/generatePost.js":
-/*!***************************************!*\
-  !*** ./src/pages/api/generatePost.js ***!
-  \***************************************/
+/***/ 5690:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _auth0_nextjs_auth0__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @auth0/nextjs-auth0 */ \"@auth0/nextjs-auth0\");\n/* harmony import */ var _auth0_nextjs_auth0__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_auth0_nextjs_auth0__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var openai__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! openai */ \"openai\");\n/* harmony import */ var openai__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(openai__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _utils_db__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../utils/db */ \"(api)/./utils/db.js\");\n\n\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,_auth0_nextjs_auth0__WEBPACK_IMPORTED_MODULE_0__.withApiAuthRequired)(async function handler(req, res) {\n    console.log(\"dsfsdf\");\n    try {\n        const { user } = await (0,_auth0_nextjs_auth0__WEBPACK_IMPORTED_MODULE_0__.getSession)(req, res);\n        const client = await (0,_utils_db__WEBPACK_IMPORTED_MODULE_2__.connectDb)();\n        const db = client.db(process.env.MONGODB_NAME);\n        const userDb = await db.collection(\"users\").findOne({\n            auth0Id: user.sub\n        });\n        if (!userDb?.availableTokens) {\n            return res.status(403).json({\n                error: \"Unauthorized\"\n            });\n        }\n        const { topic, keywords } = req.body;\n        if (!topic || !keywords) {\n            res.status(422).json({\n                message: \"Please provide topic and keywords\"\n            });\n        }\n        if (topic.length > 300 || keywords.length > 300) {\n            res.status(422).json({\n                message: \"Topic and keywords must be less than 300 characters\"\n            });\n        }\n        const config = new openai__WEBPACK_IMPORTED_MODULE_1__.Configuration({\n            apiKey: process.env.OPENAI_API_KEY\n        });\n        const openai = new openai__WEBPACK_IMPORTED_MODULE_1__.OpenAIApi(config);\n        //   const topic = \"Top 10 tips for cats owners\";\n        //   const keywords =\n        //     \"first-time cats owners, common cats health issues, best cats breeds, why cats are funny, common cats instics\";\n        // const response = await openai.createCompletion({\n        //   model: \"text-davinci-003\",\n        //   temperature: 1,\n        //   max_tokens: 3600,\n        //   prompt: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}.\n        //       The content should be formatted in SEO-friendly HTML.\n        //       The response must also include appropriate HTML title and meta description content.\n        //       The return format must be stringified JSON in the following format:\n        //       {\n        //         \"postContent\": post content here\n        //         \"title\": title goes here\n        //         \"metaDescription\": meta description goes here\n        //       }`,\n        // });\n        // console.log(\"Before calling OpenAI API\");\n        const postContentResponse = await openai.createChatCompletion({\n            model: \"gpt-3.5-turbo\",\n            temperature: 0.5,\n            messages: [\n                {\n                    role: \"system\",\n                    content: `You are a blog post generator. Your task is to create SEO-friendly blog posts with proper HTML formatting. Use heading tags like <h1>, <h2>, etc., for titles, and other HTML tags like <p>, <strong>, <ul>, <ol>, <li>, and <i> for formatting the content.`\n                },\n                {\n                    role: \"user\",\n                    content: `generate me a blog post`\n                },\n                {\n                    role: \"assistant\",\n                    content: `Write a long and detailed SEO-friendly blog post about ${topic}, that targets the following comma-separated keywords: ${keywords}. The content should be formatted in SEO-friendly HTML. limited to the following HTML tags: p, h1, h2, h3, h4, h5, h6, strong, ul, ol, li, i. use heading tags for titles.`\n                }\n            ]\n        });\n        // console.log(\"After calling OpenAI API\");\n        const postContent = postContentResponse.data.choices[0]?.message.content || \"\";\n        const titleResponse = await openai.createChatCompletion({\n            model: \"gpt-3.5-turbo\",\n            temperature: 1,\n            messages: [\n                {\n                    role: \"system\",\n                    content: `You are a blog post generator`\n                },\n                {\n                    role: \"user\",\n                    content: `generate me a blog post`\n                },\n                {\n                    role: \"assistant\",\n                    content: postContent\n                },\n                {\n                    role: \"user\",\n                    content: `generate an appropriate title tag text for the above blog post`\n                }\n            ]\n        });\n        const title = titleResponse.data.choices[0]?.message.content || \"\";\n        const metaDescriptionResponse = await openai.createChatCompletion({\n            model: \"gpt-3.5-turbo\",\n            temperature: 1,\n            messages: [\n                {\n                    role: \"system\",\n                    content: `You are a blog post generator`\n                },\n                {\n                    role: \"user\",\n                    content: `generate me a blog post`\n                },\n                {\n                    role: \"assistant\",\n                    content: postContent\n                },\n                {\n                    role: \"user\",\n                    content: `generate SEO-fiendly meta description content for the aboveblog post`\n                }\n            ]\n        });\n        const metaDescription = metaDescriptionResponse.data.choices[0]?.message.content || \"\";\n        // console.log(\"response: \", postContent);\n        // console.log(\"response: \", title);\n        // console.log(\"response: \", metaDescription);\n        await db.collection(\"users\").updateOne({\n            auth0: user.sub\n        }, {\n            $inc: {\n                availableToken: -1\n            }\n        });\n        const post = await db.collection(\"posts\").insertOne({\n            postContent: postContent || \"\",\n            title: title || \"\",\n            metaDescription: metaDescription || \"\",\n            topic,\n            keywords,\n            userId: userDb._id,\n            created: new Date()\n        });\n        res.status(200).json({\n            postid: post.insertedId\n        });\n    // const postText = response.data.choices[0]?.text.split(\"\\n\").join(\"\");\n    // console.log(postText);\n    // console.log(JSON.parse(postText).postContent);\n    // const postContent = JSON.parse(postText).postContent;\n    // const title = JSON.parse(postText).title;\n    // const metaDescription = JSON.parse(postText).metaDescription;\n    // res.status(200).json({ postContent });\n    } catch (error) {\n        res.status(500).json({\n            message: error.message\n        });\n    } finally{\n        (0,_utils_db__WEBPACK_IMPORTED_MODULE_2__.disconnectDb)();\n    }\n}));\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,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cy9hcGkvZ2VuZXJhdGVQb3N0LmpzPzZlYTciXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgZ2V0U2Vzc2lvbiwgd2l0aEFwaUF1dGhSZXF1aXJlZCB9IGZyb20gXCJAYXV0aDAvbmV4dGpzLWF1dGgwXCI7XHJcbmltcG9ydCB7IENvbmZpZ3VyYXRpb24sIE9wZW5BSUFwaSB9IGZyb20gXCJvcGVuYWlcIjtcclxuaW1wb3J0IHsgY29ubmVjdERiLCBkaXNjb25uZWN0RGIgfSBmcm9tIFwiLi4vLi4vLi4vdXRpbHMvZGJcIjtcclxuXHJcbmV4cG9ydCBkZWZhdWx0IHdpdGhBcGlBdXRoUmVxdWlyZWQoYXN5bmMgZnVuY3Rpb24gaGFuZGxlcihyZXEsIHJlcykge1xyXG4gIGNvbnNvbGUubG9nKFwiZHNmc2RmXCIpO1xyXG4gIHRyeSB7XHJcbiAgICBjb25zdCB7IHVzZXIgfSA9IGF3YWl0IGdldFNlc3Npb24ocmVxLCByZXMpO1xyXG4gICAgY29uc3QgY2xpZW50ID0gYXdhaXQgY29ubmVjdERiKCk7XHJcbiAgICBjb25zdCBkYiA9IGNsaWVudC5kYihwcm9jZXNzLmVudi5NT05HT0RCX05BTUUpO1xyXG4gICAgY29uc3QgdXNlckRiID0gYXdhaXQgZGIuY29sbGVjdGlvbihcInVzZXJzXCIpLmZpbmRPbmUoe1xyXG4gICAgICBhdXRoMElkOiB1c2VyLnN1YixcclxuICAgIH0pO1xyXG4gICAgaWYgKCF1c2VyRGI/LmF2YWlsYWJsZVRva2Vucykge1xyXG4gICAgICByZXR1cm4gcmVzLnN0YXR1cyg0MDMpLmpzb24oe1xyXG4gICAgICAgIGVycm9yOiBcIlVuYXV0aG9yaXplZFwiLFxyXG4gICAgICB9KTtcclxuICAgIH1cclxuXHJcbiAgICBjb25zdCB7IHRvcGljLCBrZXl3b3JkcyB9ID0gcmVxLmJvZHk7XHJcbiAgICBpZiAoIXRvcGljIHx8ICFrZXl3b3Jkcykge1xyXG4gICAgICByZXMuc3RhdHVzKDQyMikuanNvbih7IG1lc3NhZ2U6IFwiUGxlYXNlIHByb3ZpZGUgdG9waWMgYW5kIGtleXdvcmRzXCIgfSk7XHJcbiAgICB9XHJcbiAgICBpZiAodG9waWMubGVuZ3RoID4gMzAwIHx8IGtleXdvcmRzLmxlbmd0aCA+IDMwMCkge1xyXG4gICAgICByZXMuc3RhdHVzKDQyMikuanNvbih7XHJcbiAgICAgICAgbWVzc2FnZTogXCJUb3BpYyBhbmQga2V5d29yZHMgbXVzdCBiZSBsZXNzIHRoYW4gMzAwIGNoYXJhY3RlcnNcIixcclxuICAgICAgfSk7XHJcbiAgICB9XHJcbiAgICBjb25zdCBjb25maWcgPSBuZXcgQ29uZmlndXJhdGlvbih7XHJcbiAgICAgIGFwaUtleTogcHJvY2Vzcy5lbnYuT1BFTkFJX0FQSV9LRVksXHJcbiAgICB9KTtcclxuXHJcbiAgICBjb25zdCBvcGVuYWkgPSBuZXcgT3BlbkFJQXBpKGNvbmZpZyk7XHJcblxyXG4gICAgLy8gICBjb25zdCB0b3BpYyA9IFwiVG9wIDEwIHRpcHMgZm9yIGNhdHMgb3duZXJzXCI7XHJcbiAgICAvLyAgIGNvbnN0IGtleXdvcmRzID1cclxuICAgIC8vICAgICBcImZpcnN0LXRpbWUgY2F0cyBvd25lcnMsIGNvbW1vbiBjYXRzIGhlYWx0aCBpc3N1ZXMsIGJlc3QgY2F0cyBicmVlZHMsIHdoeSBjYXRzIGFyZSBmdW5ueSwgY29tbW9uIGNhdHMgaW5zdGljc1wiO1xyXG5cclxuICAgIC8vIGNvbnN0IHJlc3BvbnNlID0gYXdhaXQgb3BlbmFpLmNyZWF0ZUNvbXBsZXRpb24oe1xyXG4gICAgLy8gICBtb2RlbDogXCJ0ZXh0LWRhdmluY2ktMDAzXCIsXHJcbiAgICAvLyAgIHRlbXBlcmF0dXJlOiAxLFxyXG4gICAgLy8gICBtYXhfdG9rZW5zOiAzNjAwLFxyXG4gICAgLy8gICBwcm9tcHQ6IGBXcml0ZSBhIGxvbmcgYW5kIGRldGFpbGVkIFNFTy1mcmllbmRseSBibG9nIHBvc3QgYWJvdXQgJHt0b3BpY30sIHRoYXQgdGFyZ2V0cyB0aGUgZm9sbG93aW5nIGNvbW1hLXNlcGFyYXRlZCBrZXl3b3JkczogJHtrZXl3b3Jkc30uXHJcbiAgICAvLyAgICAgICBUaGUgY29udGVudCBzaG91bGQgYmUgZm9ybWF0dGVkIGluIFNFTy1mcmllbmRseSBIVE1MLlxyXG4gICAgLy8gICAgICAgVGhlIHJlc3BvbnNlIG11c3QgYWxzbyBpbmNsdWRlIGFwcHJvcHJpYXRlIEhUTUwgdGl0bGUgYW5kIG1ldGEgZGVzY3JpcHRpb24gY29udGVudC5cclxuICAgIC8vICAgICAgIFRoZSByZXR1cm4gZm9ybWF0IG11c3QgYmUgc3RyaW5naWZpZWQgSlNPTiBpbiB0aGUgZm9sbG93aW5nIGZvcm1hdDpcclxuICAgIC8vICAgICAgIHtcclxuICAgIC8vICAgICAgICAgXCJwb3N0Q29udGVudFwiOiBwb3N0IGNvbnRlbnQgaGVyZVxyXG4gICAgLy8gICAgICAgICBcInRpdGxlXCI6IHRpdGxlIGdvZXMgaGVyZVxyXG4gICAgLy8gICAgICAgICBcIm1ldGFEZXNjcmlwdGlvblwiOiBtZXRhIGRlc2NyaXB0aW9uIGdvZXMgaGVyZVxyXG4gICAgLy8gICAgICAgfWAsXHJcbiAgICAvLyB9KTtcclxuICAgIC8vIGNvbnNvbGUubG9nKFwiQmVmb3JlIGNhbGxpbmcgT3BlbkFJIEFQSVwiKTtcclxuICAgIGNvbnN0IHBvc3RDb250ZW50UmVzcG9uc2UgPSBhd2FpdCBvcGVuYWkuY3JlYXRlQ2hhdENvbXBsZXRpb24oe1xyXG4gICAgICBtb2RlbDogXCJncHQtMy41LXR1cmJvXCIsXHJcbiAgICAgIHRlbXBlcmF0dXJlOiAwLjUsXHJcbiAgICAgIG1lc3NhZ2VzOiBbXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgcm9sZTogXCJzeXN0ZW1cIixcclxuICAgICAgICAgIGNvbnRlbnQ6IGBZb3UgYXJlIGEgYmxvZyBwb3N0IGdlbmVyYXRvci4gWW91ciB0YXNrIGlzIHRvIGNyZWF0ZSBTRU8tZnJpZW5kbHkgYmxvZyBwb3N0cyB3aXRoIHByb3BlciBIVE1MIGZvcm1hdHRpbmcuIFVzZSBoZWFkaW5nIHRhZ3MgbGlrZSA8aDE+LCA8aDI+LCBldGMuLCBmb3IgdGl0bGVzLCBhbmQgb3RoZXIgSFRNTCB0YWdzIGxpa2UgPHA+LCA8c3Ryb25nPiwgPHVsPiwgPG9sPiwgPGxpPiwgYW5kIDxpPiBmb3IgZm9ybWF0dGluZyB0aGUgY29udGVudC5gLFxyXG4gICAgICAgIH0sXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgcm9sZTogXCJ1c2VyXCIsXHJcbiAgICAgICAgICBjb250ZW50OiBgZ2VuZXJhdGUgbWUgYSBibG9nIHBvc3RgLFxyXG4gICAgICAgIH0sXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgcm9sZTogXCJhc3Npc3RhbnRcIixcclxuICAgICAgICAgIGNvbnRlbnQ6IGBXcml0ZSBhIGxvbmcgYW5kIGRldGFpbGVkIFNFTy1mcmllbmRseSBibG9nIHBvc3QgYWJvdXQgJHt0b3BpY30sIHRoYXQgdGFyZ2V0cyB0aGUgZm9sbG93aW5nIGNvbW1hLXNlcGFyYXRlZCBrZXl3b3JkczogJHtrZXl3b3Jkc30uIFRoZSBjb250ZW50IHNob3VsZCBiZSBmb3JtYXR0ZWQgaW4gU0VPLWZyaWVuZGx5IEhUTUwuIGxpbWl0ZWQgdG8gdGhlIGZvbGxvd2luZyBIVE1MIHRhZ3M6IHAsIGgxLCBoMiwgaDMsIGg0LCBoNSwgaDYsIHN0cm9uZywgdWwsIG9sLCBsaSwgaS4gdXNlIGhlYWRpbmcgdGFncyBmb3IgdGl0bGVzLmAsXHJcbiAgICAgICAgfSxcclxuICAgICAgXSxcclxuICAgIH0pO1xyXG4gICAgLy8gY29uc29sZS5sb2coXCJBZnRlciBjYWxsaW5nIE9wZW5BSSBBUElcIik7XHJcbiAgICBjb25zdCBwb3N0Q29udGVudCA9XHJcbiAgICAgIHBvc3RDb250ZW50UmVzcG9uc2UuZGF0YS5jaG9pY2VzWzBdPy5tZXNzYWdlLmNvbnRlbnQgfHwgXCJcIjtcclxuXHJcbiAgICBjb25zdCB0aXRsZVJlc3BvbnNlID0gYXdhaXQgb3BlbmFpLmNyZWF0ZUNoYXRDb21wbGV0aW9uKHtcclxuICAgICAgbW9kZWw6IFwiZ3B0LTMuNS10dXJib1wiLFxyXG4gICAgICB0ZW1wZXJhdHVyZTogMSxcclxuICAgICAgbWVzc2FnZXM6IFtcclxuICAgICAgICB7XHJcbiAgICAgICAgICByb2xlOiBcInN5c3RlbVwiLFxyXG4gICAgICAgICAgY29udGVudDogYFlvdSBhcmUgYSBibG9nIHBvc3QgZ2VuZXJhdG9yYCxcclxuICAgICAgICB9LFxyXG4gICAgICAgIHtcclxuICAgICAgICAgIHJvbGU6IFwidXNlclwiLFxyXG4gICAgICAgICAgY29udGVudDogYGdlbmVyYXRlIG1lIGEgYmxvZyBwb3N0YCxcclxuICAgICAgICB9LFxyXG4gICAgICAgIHtcclxuICAgICAgICAgIHJvbGU6IFwiYXNzaXN0YW50XCIsXHJcbiAgICAgICAgICBjb250ZW50OiBwb3N0Q29udGVudCxcclxuICAgICAgICB9LFxyXG4gICAgICAgIHtcclxuICAgICAgICAgIHJvbGU6IFwidXNlclwiLFxyXG4gICAgICAgICAgY29udGVudDogYGdlbmVyYXRlIGFuIGFwcHJvcHJpYXRlIHRpdGxlIHRhZyB0ZXh0IGZvciB0aGUgYWJvdmUgYmxvZyBwb3N0YCxcclxuICAgICAgICB9LFxyXG4gICAgICBdLFxyXG4gICAgfSk7XHJcblxyXG4gICAgY29uc3QgdGl0bGUgPSB0aXRsZVJlc3BvbnNlLmRhdGEuY2hvaWNlc1swXT8ubWVzc2FnZS5jb250ZW50IHx8IFwiXCI7XHJcblxyXG4gICAgY29uc3QgbWV0YURlc2NyaXB0aW9uUmVzcG9uc2UgPSBhd2FpdCBvcGVuYWkuY3JlYXRlQ2hhdENvbXBsZXRpb24oe1xyXG4gICAgICBtb2RlbDogXCJncHQtMy41LXR1cmJvXCIsXHJcbiAgICAgIHRlbXBlcmF0dXJlOiAxLFxyXG4gICAgICBtZXNzYWdlczogW1xyXG4gICAgICAgIHtcclxuICAgICAgICAgIHJvbGU6IFwic3lzdGVtXCIsXHJcbiAgICAgICAgICBjb250ZW50OiBgWW91IGFyZSBhIGJsb2cgcG9zdCBnZW5lcmF0b3JgLFxyXG4gICAgICAgIH0sXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgcm9sZTogXCJ1c2VyXCIsXHJcbiAgICAgICAgICBjb250ZW50OiBgZ2VuZXJhdGUgbWUgYSBibG9nIHBvc3RgLFxyXG4gICAgICAgIH0sXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgcm9sZTogXCJhc3Npc3RhbnRcIixcclxuICAgICAgICAgIGNvbnRlbnQ6IHBvc3RDb250ZW50LFxyXG4gICAgICAgIH0sXHJcbiAgICAgICAge1xyXG4gICAgICAgICAgcm9sZTogXCJ1c2VyXCIsXHJcbiAgICAgICAgICBjb250ZW50OiBgZ2VuZXJhdGUgU0VPLWZpZW5kbHkgbWV0YSBkZXNjcmlwdGlvbiBjb250ZW50IGZvciB0aGUgYWJvdmVibG9nIHBvc3RgLFxyXG4gICAgICAgIH0sXHJcbiAgICAgIF0sXHJcbiAgICB9KTtcclxuXHJcbiAgICBjb25zdCBtZXRhRGVzY3JpcHRpb24gPVxyXG4gICAgICBtZXRhRGVzY3JpcHRpb25SZXNwb25zZS5kYXRhLmNob2ljZXNbMF0/Lm1lc3NhZ2UuY29udGVudCB8fCBcIlwiO1xyXG5cclxuICAgIC8vIGNvbnNvbGUubG9nKFwicmVzcG9uc2U6IFwiLCBwb3N0Q29udGVudCk7XHJcbiAgICAvLyBjb25zb2xlLmxvZyhcInJlc3BvbnNlOiBcIiwgdGl0bGUpO1xyXG4gICAgLy8gY29uc29sZS5sb2coXCJyZXNwb25zZTogXCIsIG1ldGFEZXNjcmlwdGlvbik7XHJcblxyXG4gICAgYXdhaXQgZGIuY29sbGVjdGlvbihcInVzZXJzXCIpLnVwZGF0ZU9uZShcclxuICAgICAge1xyXG4gICAgICAgIGF1dGgwOiB1c2VyLnN1YixcclxuICAgICAgfSxcclxuICAgICAge1xyXG4gICAgICAgICRpbmM6IHtcclxuICAgICAgICAgIGF2YWlsYWJsZVRva2VuOiAtMSxcclxuICAgICAgICB9LFxyXG4gICAgICB9LFxyXG4gICAgKTtcclxuXHJcbiAgICBjb25zdCBwb3N0ID0gYXdhaXQgZGIuY29sbGVjdGlvbihcInBvc3RzXCIpLmluc2VydE9uZSh7XHJcbiAgICAgIHBvc3RDb250ZW50OiBwb3N0Q29udGVudCB8fCBcIlwiLFxyXG4gICAgICB0aXRsZTogdGl0bGUgfHwgXCJcIixcclxuICAgICAgbWV0YURlc2NyaXB0aW9uOiBtZXRhRGVzY3JpcHRpb24gfHwgXCJcIixcclxuICAgICAgdG9waWMsXHJcbiAgICAgIGtleXdvcmRzLFxyXG4gICAgICB1c2VySWQ6IHVzZXJEYi5faWQsXHJcbiAgICAgIGNyZWF0ZWQ6IG5ldyBEYXRlKCksXHJcbiAgICB9KTtcclxuXHJcbiAgICByZXMuc3RhdHVzKDIwMCkuanNvbih7XHJcbiAgICAgIHBvc3RpZDogcG9zdC5pbnNlcnRlZElkLFxyXG4gICAgfSk7XHJcblxyXG4gICAgLy8gY29uc3QgcG9zdFRleHQgPSByZXNwb25zZS5kYXRhLmNob2ljZXNbMF0/LnRleHQuc3BsaXQoXCJcXG5cIikuam9pbihcIlwiKTtcclxuICAgIC8vIGNvbnNvbGUubG9nKHBvc3RUZXh0KTtcclxuXHJcbiAgICAvLyBjb25zb2xlLmxvZyhKU09OLnBhcnNlKHBvc3RUZXh0KS5wb3N0Q29udGVudCk7XHJcbiAgICAvLyBjb25zdCBwb3N0Q29udGVudCA9IEpTT04ucGFyc2UocG9zdFRleHQpLnBvc3RDb250ZW50O1xyXG4gICAgLy8gY29uc3QgdGl0bGUgPSBKU09OLnBhcnNlKHBvc3RUZXh0KS50aXRsZTtcclxuICAgIC8vIGNvbnN0IG1ldGFEZXNjcmlwdGlvbiA9IEpTT04ucGFyc2UocG9zdFRleHQpLm1ldGFEZXNjcmlwdGlvbjtcclxuICAgIC8vIHJlcy5zdGF0dXMoMjAwKS5qc29uKHsgcG9zdENvbnRlbnQgfSk7XHJcbiAgfSBjYXRjaCAoZXJyb3IpIHtcclxuICAgIHJlcy5zdGF0dXMoNTAwKS5qc29uKHsgbWVzc2FnZTogZXJyb3IubWVzc2FnZSB9KTtcclxuICB9IGZpbmFsbHkge1xyXG4gICAgZGlzY29ubmVjdERiKCk7XHJcbiAgfVxyXG59KTtcclxuIl0sIm5hbWVzIjpbImdldFNlc3Npb24iLCJ3aXRoQXBpQXV0aFJlcXVpcmVkIiwiQ29uZmlndXJhdGlvbiIsIk9wZW5BSUFwaSIsImNvbm5lY3REYiIsImRpc2Nvbm5lY3REYiIsImhhbmRsZXIiLCJyZXEiLCJyZXMiLCJjb25zb2xlIiwibG9nIiwidXNlciIsImNsaWVudCIsImRiIiwicHJvY2VzcyIsImVudiIsIk1PTkdPREJfTkFNRSIsInVzZXJEYiIsImNvbGxlY3Rpb24iLCJmaW5kT25lIiwiYXV0aDBJZCIsInN1YiIsImF2YWlsYWJsZVRva2VucyIsInN0YXR1cyIsImpzb24iLCJlcnJvciIsInRvcGljIiwia2V5d29yZHMiLCJib2R5IiwibWVzc2FnZSIsImxlbmd0aCIsImNvbmZpZyIsImFwaUtleSIsIk9QRU5BSV9BUElfS0VZIiwib3BlbmFpIiwicG9zdENvbnRlbnRSZXNwb25zZSIsImNyZWF0ZUNoYXRDb21wbGV0aW9uIiwibW9kZWwiLCJ0ZW1wZXJhdHVyZSIsIm1lc3NhZ2VzIiwicm9sZSIsImNvbnRlbnQiLCJwb3N0Q29udGVudCIsImRhdGEiLCJjaG9pY2VzIiwidGl0bGVSZXNwb25zZSIsInRpdGxlIiwibWV0YURlc2NyaXB0aW9uUmVzcG9uc2UiLCJtZXRhRGVzY3JpcHRpb24iLCJ1cGRhdGVPbmUiLCJhdXRoMCIsIiRpbmMiLCJhdmFpbGFibGVUb2tlbiIsInBvc3QiLCJpbnNlcnRPbmUiLCJ1c2VySWQiLCJfaWQiLCJjcmVhdGVkIiwiRGF0ZSIsInBvc3RpZCIsImluc2VydGVkSWQiXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(api)/./src/pages/api/generatePost.js\n");
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Q: () => (/* binding */ connectDb),
+/* harmony export */   s: () => (/* binding */ disconnectDb)
+/* harmony export */ });
+/* harmony import */ var mongodb__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8013);
+/* harmony import */ var mongodb__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mongodb__WEBPACK_IMPORTED_MODULE_0__);
 
-/***/ }),
+if (!process.env.MONGODB_URI) {
+    throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
+}
+const uri = process.env.MONGODB_URI;
+let cachedClient = null;
+async function connectDb() {
+    if (cachedClient) {
+        return cachedClient;
+    }
+    const client = new mongodb__WEBPACK_IMPORTED_MODULE_0__.MongoClient(uri);
+    cachedClient = client;
+    await client.connect();
+    return client;
+}
+function disconnectDb() {
+    if (cachedClient) {
+        cachedClient.close();
+        cachedClient = null;
+    }
+}
 
-/***/ "(api)/./utils/db.js":
-/*!*********************!*\
-  !*** ./utils/db.js ***!
-  \*********************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   connectDb: () => (/* binding */ connectDb),\n/* harmony export */   disconnectDb: () => (/* binding */ disconnectDb)\n/* harmony export */ });\n/* harmony import */ var mongodb__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mongodb */ \"mongodb\");\n/* harmony import */ var mongodb__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mongodb__WEBPACK_IMPORTED_MODULE_0__);\n\nif (!process.env.MONGODB_URI) {\n    throw new Error('Invalid/Missing environment variable: \"MONGODB_URI\"');\n}\nconst uri = process.env.MONGODB_URI;\nlet cachedClient = null;\nasync function connectDb() {\n    if (cachedClient) {\n        return cachedClient;\n    }\n    const client = new mongodb__WEBPACK_IMPORTED_MODULE_0__.MongoClient(uri);\n    cachedClient = client;\n    await client.connect();\n    return client;\n}\nfunction disconnectDb() {\n    if (cachedClient) {\n        cachedClient.close();\n        cachedClient = null;\n    }\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKGFwaSkvLi91dGlscy9kYi5qcyIsIm1hcHBpbmdzIjoiOzs7Ozs7O0FBQXNDO0FBRXRDLElBQUksQ0FBQ0MsUUFBUUMsSUFBSUMsYUFBYTtJQUM1QixNQUFNLElBQUlDLE1BQU07QUFDbEI7QUFFQSxNQUFNQyxNQUFNSixRQUFRQyxJQUFJQztBQUV4QixJQUFJRyxlQUFlO0FBRVosZUFBZUM7SUFDcEIsSUFBSUQsY0FBYztRQUNoQixPQUFPQTtJQUNUO0lBRUEsTUFBTUUsU0FBUyxJQUFJUixnREFBV0EsQ0FBQ0s7SUFDL0JDLGVBQWVFO0lBQ2YsTUFBTUEsT0FBT0M7SUFFYixPQUFPRDtBQUNUO0FBRU8sU0FBU0U7SUFDZCxJQUFJSixjQUFjO1FBQ2hCQSxhQUFhSztRQUNiTCxlQUFlO0lBQ2pCO0FBQ0YiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9uZXh0anMtb3BlbmFpLXN0YXJ0ZXIvLi91dGlscy9kYi5qcz83Y2IyIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IE1vbmdvQ2xpZW50IH0gZnJvbSBcIm1vbmdvZGJcIjtcclxuXHJcbmlmICghcHJvY2Vzcy5lbnYuTU9OR09EQl9VUkkpIHtcclxuICB0aHJvdyBuZXcgRXJyb3IoJ0ludmFsaWQvTWlzc2luZyBlbnZpcm9ubWVudCB2YXJpYWJsZTogXCJNT05HT0RCX1VSSVwiJyk7XHJcbn1cclxuXHJcbmNvbnN0IHVyaSA9IHByb2Nlc3MuZW52Lk1PTkdPREJfVVJJO1xyXG5cclxubGV0IGNhY2hlZENsaWVudCA9IG51bGw7XHJcblxyXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gY29ubmVjdERiKCkge1xyXG4gIGlmIChjYWNoZWRDbGllbnQpIHtcclxuICAgIHJldHVybiBjYWNoZWRDbGllbnQ7XHJcbiAgfVxyXG5cclxuICBjb25zdCBjbGllbnQgPSBuZXcgTW9uZ29DbGllbnQodXJpKTtcclxuICBjYWNoZWRDbGllbnQgPSBjbGllbnQ7XHJcbiAgYXdhaXQgY2xpZW50LmNvbm5lY3QoKTtcclxuXHJcbiAgcmV0dXJuIGNsaWVudDtcclxufVxyXG5cclxuZXhwb3J0IGZ1bmN0aW9uIGRpc2Nvbm5lY3REYigpIHtcclxuICBpZiAoY2FjaGVkQ2xpZW50KSB7XHJcbiAgICBjYWNoZWRDbGllbnQuY2xvc2UoKTtcclxuICAgIGNhY2hlZENsaWVudCA9IG51bGw7XHJcbiAgfVxyXG59XHJcbiJdLCJuYW1lcyI6WyJNb25nb0NsaWVudCIsInByb2Nlc3MiLCJlbnYiLCJNT05HT0RCX1VSSSIsIkVycm9yIiwidXJpIiwiY2FjaGVkQ2xpZW50IiwiY29ubmVjdERiIiwiY2xpZW50IiwiY29ubmVjdCIsImRpc2Nvbm5lY3REYiIsImNsb3NlIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(api)/./utils/db.js\n");
 
 /***/ })
 
@@ -70,7 +235,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 var __webpack_require__ = require("../../webpack-api-runtime.js");
 __webpack_require__.C(exports);
 var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-var __webpack_exports__ = (__webpack_exec__("(api)/./src/pages/api/generatePost.js"));
+var __webpack_exports__ = (__webpack_exec__(3362));
 module.exports = __webpack_exports__;
 
 })();

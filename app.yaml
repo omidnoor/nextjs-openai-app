@@ -1,8 +1,20 @@
-runtime: nodejs16
-
+runtime: nodejs18 # or the version of Node.js you are using
 instance_class: F2
+automatic_scaling:
+  target_cpu_utilization: 0.65
 
 env_variables:
+  NODE_ENV: "production"
   NEXT_PUBLIC_GOOGLE_CLOUD_PROJECT: nextjs-openai-app
-# https://nextjs-openai-app.uw.r.appspot.com
-# nextjs-openai-app@appspot.gserviceaccount.com]
+  PORT: 8080
+  OPENAI_API_KEY: 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
+  AUTH0_SECRET: S3Qb9YiBTnWSUrgYb9nwnv10G81XbUcv1O25
+  AUTH0_BASE_URL: https://nextjs-openai-app.uw.r.appspot.com
+  AUTH0_ISSUER_BASE_URL: https://dev-cfwmoveziivlgpur.us.auth0.com
+  AUTH0_CLIENT_ID: Pd7HZJC2MnSOzz83VWi7XObtElaYyn34
+  AUTH0_CLIENT_SECRET: aAZ9TA4IrKdbpfK2GBNXipW0qJI6op4KeDq3oI4GkysXkbl6AVyhUfcpfVDCBv_q
+  MONGODB_URI: mongodb+srv://onoorshams:vrPYT6TB6BTtMSlQ@cluster0.hj5duz1.mongodb.net/test
+  MONGODB_NAME: UtopAI
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_51N3Vm1Ivjnd6R2JiXEaNS3Qb9YiBTnWSUrgYb9nwnv10G81XbUcv1O250vy46PUed8TWnsfJcfFKXZjdedtWDvRN000B2bOx28
+  STRIPE_SECRET_KEY: sk_test_51N3Vm1Ivjnd6R2Jixx1mG0TdyVR79yJKP8bcHkhbFnXgoTw51ZUaZ7Yt5mT8Ll6Cuh9AmrQUWDYD7SRD2Hj5y14800wDXuYLWR
+  STRIPE_WEBHOOK_SECRET: whsec_3f884e3a50f4f1808e40caaf8df43283eed70b9cc758ecd0997e6e26a3eb34bfSTRIPE_PRODUCT_PRICE_ID:price_1N3VocIvjnd6R2JixtYeMRfN
